@@ -1,5 +1,6 @@
 using System.Collections;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -15,16 +16,20 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private bool canJump = true;
     [SerializeField] private bool canCrouch = true;
     [SerializeField] private bool canUseHeadbob = true;
+    [SerializeField] private bool canSlideOnSlopes = true;
+    [SerializeField] private bool canInteract = true;
 
     [Header("Controls")]
     [SerializeField] private KeyCode sprintKey = KeyCode.LeftShift;
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode crouchKey = KeyCode.LeftControl;
+    [SerializeField] private KeyCode interactKey = KeyCode.E;
 
     [Header("Movement Parameters")]
     [SerializeField] private float walkSpeed = 3.0f;
     [SerializeField] private float sprintSpeed = 6.0f;
     [SerializeField] private float crouchSpeed = 1.5f;
+    [SerializeField] private float slopeSpeed = 8f;
 
     [Header("Look Parameters")]
     [SerializeField, Range(1, 10)] private float lookSpeedX = 2.0f;
@@ -54,6 +59,30 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private float crouchBobAmount = .02f;
     private float defaultYPos = 8;
     private float timer;
+
+    // SLIDING PARAMETERS
+    private Vector3 hitPointNormal;
+    private bool IsSliding
+    {
+        get
+        {
+            if (characterController.isGrounded & Physics.Raycast(transform.position, Vector3.down, out RaycastHit slopeHit, 2f))
+            {
+                hitPointNormal = slopeHit.normal;
+                return Vector3.Angle(hitPointNormal, Vector3.up) > characterController.slopeLimit;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    [Header("Interaction")]
+    [SerializeField] private Vector3 interactionRayPoint = default;
+    [SerializeField] private float interactionDistance = default;
+    [SerializeField] private LayerMask interactionLayer = default;
+    private Interactable currentInteractable;
 
     private Camera playerCamera;
 
@@ -90,6 +119,12 @@ public class FirstPersonController : MonoBehaviour
 
             if (canUseHeadbob)
                 HandleHeadbob();
+
+            if (canInteract)
+            {
+                HandleInteractionCheck();
+                HandleInteractionInput();
+            }
 
             ApplyFinalMovements();
         }
@@ -133,6 +168,39 @@ public class FirstPersonController : MonoBehaviour
         }
     }
 
+    void HandleInteractionCheck()
+    {
+        if (Physics.Raycast(playerCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit, interactionDistance))
+        {
+            bool isInteractableDefinedOrDifferent = (currentInteractable == null || hit.collider.gameObject.GetInstanceID() != currentInteractable.GetInstanceID());
+            bool isInteractableLayer = hit.collider.gameObject.layer == 7; // Layer 7 is for Interactables
+
+            if (isInteractableLayer && isInteractableDefinedOrDifferent)
+            {
+                hit.collider.TryGetComponent(out currentInteractable);
+
+                if (currentInteractable)
+                {
+                    currentInteractable.OnFocus();
+                }
+            }
+            else if (currentInteractable)
+            {
+                currentInteractable.OnLoseFocus();
+                currentInteractable = null;
+            }
+        }
+    }
+
+    void HandleInteractionInput()
+    {
+        bool isInteracting = Physics.Raycast(playerCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit, interactionDistance, interactionLayer);
+        if (Input.GetKeyDown(interactKey) && currentInteractable != null && isInteracting)
+        {
+            currentInteractable.OnInteract();
+        }
+    }
+
     /*
     * Vertical movement of the mouse controls the X axis of the Camera.
     * Horizontal movement of the mouse controls the Y axis of the Character.
@@ -157,6 +225,9 @@ public class FirstPersonController : MonoBehaviour
     {
         if (!characterController.isGrounded)
             moveDirection.y -= gravity * Time.deltaTime;
+
+        if (canSlideOnSlopes && IsSliding)
+            moveDirection += new Vector3(hitPointNormal.x, -hitPointNormal.y, hitPointNormal.z) * slopeSpeed;
 
         characterController.Move(moveDirection * Time.deltaTime);
     }
