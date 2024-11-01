@@ -13,7 +13,9 @@ TagManager:
   - UI
   - 
   - Interactable
-  - 
+  - Surface
+  - Obstacle
+  - Player
   - 
   - 
   - 
