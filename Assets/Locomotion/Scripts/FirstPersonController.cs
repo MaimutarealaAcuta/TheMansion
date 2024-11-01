@@ -159,4 +159,9 @@ public class FirstPersonController : MonoBehaviour
 
         duringCrouchAnimation = false;
     }
+
+    public bool IsCrouching()
+    {
+        return isCrouching;
+    }
 }
