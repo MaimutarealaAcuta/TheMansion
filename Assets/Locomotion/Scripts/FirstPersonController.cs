@@ -186,6 +186,28 @@ public class FirstPersonController : MonoBehaviour
 
         moveDirection = (transform.TransformDirection(Vector3.forward) * currentInput.x) + (transform.TransformDirection(Vector3.right) * currentInput.y);
         moveDirection.y = moveDirectionY;
+
+        float avoidFloorDistance = -0.8f;
+        float ladderGrabDistance = 0.7f;
+
+        var direction = new Vector3(moveDirection.x, 0, moveDirection.z).normalized;
+
+        Vector3 rayStart = transform.position + Vector3.up * avoidFloorDistance;
+        Vector3 rayEnd = rayStart + direction * ladderGrabDistance;
+
+        // Visualize the ray in the Scene view
+        Debug.DrawLine(rayStart, rayEnd, Color.red, 5f);
+
+        if (Physics.Raycast(transform.position + Vector3.up * avoidFloorDistance, direction, out RaycastHit raycastHit, ladderGrabDistance))
+        {
+            print(raycastHit.transform);
+            if (raycastHit.transform.TryGetComponent(out Ladder ladder))
+            {
+                moveDirection.y = new Vector3(moveDirection.x, 0, moveDirection.z).magnitude;
+                moveDirection.x = 0;
+                moveDirection.z = 0;
+            }
+        }
     }
 
     void HandleJump()
