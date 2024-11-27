@@ -10,6 +10,7 @@ public class Door : Interactable
     [SerializeField] private float openSpeed = 2f;
     [SerializeField] private float colliderEnableThreshold = 5f;
 
+    private Door otherDoorRef;
     private bool isOpen = false;
     private bool isMoving = false;
     private Quaternion closedRotation;
@@ -24,6 +25,7 @@ public class Door : Interactable
 
         if (isDoubleDoor && otherDoor != null)
         {
+            otherDoorRef = otherDoor.GetComponent<Door>();
             otherDoorClosedRotation = otherDoor.rotation;
             // Other door opens in opposite direction
             otherDoorOpenRotation = otherDoorClosedRotation * Quaternion.Euler(0, -openAngle, 0);
@@ -35,6 +37,7 @@ public class Door : Interactable
         if (!isMoving)
         {
             isOpen = !isOpen;
+            otherDoorRef.isOpen = isOpen;
             StartCoroutine(RotateDoors());
         }
     }
@@ -42,6 +45,7 @@ public class Door : Interactable
     private IEnumerator RotateDoors()
     {
         isMoving = true;
+        otherDoorRef.isMoving = true;
 
         // Get colliders
         Collider mainCollider = GetComponent<Collider>();
@@ -100,6 +104,7 @@ public class Door : Interactable
         }
 
         isMoving = false;
+        otherDoorRef.isMoving = false;
     }
 
     public override void OnFocus()
