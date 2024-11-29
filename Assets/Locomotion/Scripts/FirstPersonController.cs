@@ -5,7 +5,7 @@ using UnityEngine;
 public class FirstPersonController : MonoBehaviour
 {
     public bool CanMove { get; private set; } = true;
-    private bool IsSprinting => canSprint & Input.GetKey(sprintKey);
+    public bool IsSprinting => canSprint & Input.GetKey(sprintKey);
     private bool ShouldJump => Input.GetKeyDown(jumpKey) && characterController.isGrounded;
     private bool ShouldCrouch => Input.GetKeyDown(crouchKey) & !duringCrouchAnimation && characterController.isGrounded;
 
@@ -26,9 +26,9 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private KeyCode interactKey = KeyCode.Mouse0;
 
     [Header("Movement Parameters")]
-    [SerializeField] private float walkSpeed = 3.0f;
-    [SerializeField] private float sprintSpeed = 6.0f;
-    [SerializeField] private float crouchSpeed = 1.5f;
+    [SerializeField] public float walkSpeed = 3.0f;
+    [SerializeField] public float sprintSpeed = 6.0f;
+    [SerializeField] public float crouchSpeed = 1.5f;
     [SerializeField] private float slopeSpeed = 8f;
 
     [Header("Look Parameters")]
@@ -64,7 +64,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private float timeToCrouch = 0.25f;
     [SerializeField] private Vector3 crouchingCenter = new Vector3(0, 0.5f, 0);
     [SerializeField] private Vector3 standingCenter = new Vector3(0, 0, 0);
-    private bool isCrouching;
+    public bool isCrouching;
     private bool duringCrouchAnimation;
 
     [Header("Headbob Parameters")]
@@ -113,10 +113,11 @@ public class FirstPersonController : MonoBehaviour
 
     private Camera playerCamera;
 
+    private StateMachine playerStateMachine;
     private CharacterController characterController;
-    private Vector3 moveDirection;
+    public Vector3 moveDirection;
 
-    private Vector2 currentInput;
+    public Vector2 currentInput;
 
     private float rotationX = 0;
 
@@ -134,6 +135,8 @@ public class FirstPersonController : MonoBehaviour
     {
         playerCamera = GetComponentInChildren<Camera>();
         characterController = GetComponent<CharacterController>();
+        playerStateMachine = new StateMachine(this);
+        
         currentHealth = maxHealth;
         currentStamina = maxStamina;
 
@@ -147,7 +150,8 @@ public class FirstPersonController : MonoBehaviour
     {
         if (CanMove)
         {
-            HandleMovementInput();
+            //HandleMovementInput();
+            playerStateMachine.HandleAction(playerStateMachine.Actions.Input);
             HandleMouseLook();
 
             if (canJump)
@@ -191,12 +195,6 @@ public class FirstPersonController : MonoBehaviour
         float ladderGrabDistance = 0.7f;
 
         var direction = new Vector3(moveDirection.x, 0, moveDirection.z).normalized;
-
-        Vector3 rayStart = transform.position + Vector3.up * avoidFloorDistance;
-        Vector3 rayEnd = rayStart + direction * ladderGrabDistance;
-
-        // Visualize the ray in the Scene view
-        Debug.DrawLine(rayStart, rayEnd, Color.red, 5f);
 
         if (Physics.Raycast(transform.position + Vector3.up * avoidFloorDistance, direction, out RaycastHit raycastHit, ladderGrabDistance))
         {
