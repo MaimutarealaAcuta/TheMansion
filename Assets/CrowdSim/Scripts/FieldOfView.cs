@@ -17,6 +17,7 @@ public class FieldOfView : MonoBehaviour
     public GameObject playerRef;
     public LayerMask targetMask;
     public LayerMask obstructionMask;
+    public LayerMask interactableMask;
 
     public bool canSeePlayer = false;
     FirstPersonController playerControler;
@@ -66,7 +67,7 @@ public class FieldOfView : MonoBehaviour
                 float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
                 // Perform the first raycast to the player's center position
-                if (!Physics.Raycast(transform.position + new Vector3(0, rayHeight, 0), directionToTarget, distanceToTarget, obstructionMask))
+                if (!Physics.Raycast(transform.position + new Vector3(0, rayHeight, 0), directionToTarget, distanceToTarget, obstructionMask | interactableMask))
                 {
                     canSeePlayer = true;
                 }
@@ -76,7 +77,7 @@ public class FieldOfView : MonoBehaviour
                     Vector3 headPosition = playerRef.transform.position + new Vector3(0, playerHeightOffset, 0);
                     Vector3 directionToHead = (headPosition - transform.position).normalized;
 
-                    if (!Physics.Raycast(transform.position + new Vector3(0, rayHeight, 0), directionToHead, distanceToTarget, obstructionMask))
+                    if (!Physics.Raycast(transform.position + new Vector3(0, rayHeight, 0), directionToHead, distanceToTarget, obstructionMask | interactableMask))
                     {
                         canSeePlayer = true;
                     }

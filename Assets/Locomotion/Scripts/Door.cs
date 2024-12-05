@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Door : Interactable
 {
@@ -18,6 +19,9 @@ public class Door : Interactable
     private Quaternion otherDoorClosedRotation;
     private Quaternion otherDoorOpenRotation;
 
+    private NavMeshObstacle navMeshObst;
+
+
     private void Start()
     {
         closedRotation = transform.rotation;
@@ -30,16 +34,26 @@ public class Door : Interactable
             // Other door opens in opposite direction
             otherDoorOpenRotation = otherDoorClosedRotation * Quaternion.Euler(0, -openAngle, 0);
         }
+
+
+        if (transform.parent.TryGetComponent<NavMeshObstacle>(out navMeshObst))
+        {
+            navMeshObst.enabled = true;
+        }
     }
 
     public override void OnInteract()
     {
+        
+
         if (!isMoving)
         {
             isOpen = !isOpen;
             otherDoorRef.isOpen = isOpen;
             StartCoroutine(RotateDoors());
         }
+
+
     }
 
     private IEnumerator RotateDoors()
@@ -64,6 +78,8 @@ public class Door : Interactable
         Quaternion otherTargetRotation = isOpen ? otherDoorOpenRotation : otherDoorClosedRotation;
 
         float remainingAngle;
+
+        bool navMeshChanged = false;
 
         do
         {
@@ -90,6 +106,15 @@ public class Door : Interactable
             {
                 if (!mainCollider.enabled) mainCollider.enabled = true;
                 if (otherCollider != null && !otherCollider.enabled) otherCollider.enabled = true;
+            }
+
+
+            //Let enemy through
+            if (!navMeshChanged && remainingAngle < 40f && navMeshObst != null)
+            {
+                navMeshObst.enabled = !navMeshObst.enabled;
+                navMeshChanged = true;
+                print("navmeshchanged");
             }
 
             yield return null;
