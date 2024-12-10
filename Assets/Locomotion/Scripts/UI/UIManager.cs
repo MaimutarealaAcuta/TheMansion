@@ -1,13 +1,9 @@
-<<<<<<< HEAD
 using System.Collections;
 using TMPro;
-=======
->>>>>>> 41b4171424be09a5b91d797761b44aa171482b6e
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
-<<<<<<< HEAD
     public static UIManager Instance { get; private set; }
 
     [Header("Message Display Settings")]
@@ -39,10 +35,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-=======
-    public GameObject gameOverPanel;
-
->>>>>>> 41b4171424be09a5b91d797761b44aa171482b6e
     private void OnEnable()
     {
         GameStateManager.OnGameOver += ShowGameOverPanel;
@@ -55,7 +47,6 @@ public class UIManager : MonoBehaviour
         GameStateManager.OnGameRestart -= HideGameOverPanel;
     }
 
-<<<<<<< HEAD
     /// <summary>
     /// Show a message on screen that fades in, stays for displayDuration, and then fades out.
     /// If this method is called again while a message is displaying, it overwrites the previous message.
@@ -135,8 +126,6 @@ public class UIManager : MonoBehaviour
         infoMessage.color = c;
     }
 
-=======
->>>>>>> 41b4171424be09a5b91d797761b44aa171482b6e
     private void ShowGameOverPanel()
     {
         if (gameOverPanel != null)

@@ -3,24 +3,14 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-public class FirstPersonController : MonoBehaviour
 public class FirstPersonController : MonoBehaviour, IDamageable
 {
-    public bool CanMove { get; private set; } = true;
     public bool CanMove { get; set; } = true;
     private bool IsSprinting => canSprint & Input.GetKey(sprintKey);
     private bool ShouldJump => Input.GetKeyDown(jumpKey) && characterController.isGrounded;
     private bool ShouldCrouch => Input.GetKeyDown(crouchKey) & !duringCrouchAnimation && characterController.isGrounded;
 
     [Header("Functional Options")]
-    [SerializeField] private bool canSprint = true;
-    [SerializeField] private bool canJump = true;
-    [SerializeField] private bool canCrouch = true;
-    [SerializeField] private bool canUseHeadbob = true;
-    [SerializeField] private bool canSlideOnSlopes = true;
-    [SerializeField] private bool canInteract = true;
-    [SerializeField] private bool useFootsteps = true;
-    [SerializeField] private bool useStamina = true;
     [SerializeField] public bool canSprint = true;
     [SerializeField] public bool canJump = true;
     [SerializeField] public bool canCrouch = true;
@@ -49,8 +39,6 @@ public class FirstPersonController : MonoBehaviour, IDamageable
     [SerializeField, Range(1, 180)] private float lowerLookLimit = 80.0f;
 
     [Header("Health Parameters")]
-    [SerializeField] private float maxHealth = 100;
-    [SerializeField] private float currentHealth;
     [SerializeField] private float maxHealth = 3;
     [SerializeField] public float currentHealth;
     public static Action<float> OnTakeDamage;
@@ -129,23 +117,9 @@ public class FirstPersonController : MonoBehaviour, IDamageable
 
     [HideInInspector] public CharacterController characterController;
     private Camera playerCamera;
-
-    private CharacterController characterController;
     private Vector3 moveDirection;
-
     private Vector2 currentInput;
-
     private float rotationX = 0;
-
-    private void OnEnable()
-    {
-        OnTakeDamage += ApplyDamage;
-    }
-
-    private void OnDisable()
-    {
-        OnTakeDamage -= ApplyDamage;
-    }
     private IPlayerState currentState;
 
     void Awake()
@@ -166,37 +140,10 @@ public class FirstPersonController : MonoBehaviour, IDamageable
 
     void Update()
     {
-        if (CanMove)
-        {
-            HandleMovementInput();
-            HandleMouseLook();
-
-            if (canJump)
-                HandleJump();
-
-            if (canCrouch)
-                HandleCrouch();
-
-            if (canUseHeadbob)
-                HandleHeadbob();
-
-            if (useFootsteps)
-                HandleFoodsteps();
-
-            if (canInteract)
-            {
-                HandleInteractionCheck();
-                HandleInteractionInput();
-            }
-
-            if (useStamina)
-            {
-                HandleStamina();
-            }
         currentState.UpdateState();
     }
 
-            ApplyFinalMovements();
+            
     public void SetPlayerState(IPlayerState newState)
     {
         if (currentState != null)
@@ -207,7 +154,6 @@ public class FirstPersonController : MonoBehaviour, IDamageable
         currentState.EnterState(this);
     }
 
-    private void HandleMovementInput()
     public void HandleMovementInput()
     {
         float movementSpeed = isCrouching ? crouchSpeed : IsSprinting ? sprintSpeed : walkSpeed;
@@ -241,21 +187,18 @@ public class FirstPersonController : MonoBehaviour, IDamageable
         }
     }
 
-    void HandleJump()
     public void HandleJump()
     {
         if (ShouldJump)
             moveDirection.y = jumpForce;
     }
 
-    void HandleCrouch()
     public void HandleCrouch()
     {
         if (ShouldCrouch)
             StartCoroutine(CrouchStand());
     }
 
-    void HandleHeadbob()
     public void HandleHeadbob()
     {
         if (!characterController.isGrounded) return;
@@ -271,7 +214,6 @@ public class FirstPersonController : MonoBehaviour, IDamageable
         }
     }
 
-    private void HandleFoodsteps()
     public void HandleFootsteps()
     {
         // No sound if you aren't grounded or not moving at all
@@ -303,7 +245,6 @@ public class FirstPersonController : MonoBehaviour, IDamageable
         }
     }
 
-    void HandleInteractionCheck()
     public void HandleInteractionCheck()
     {
         if (Physics.Raycast(playerCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit, interactionDistance))
@@ -328,7 +269,6 @@ public class FirstPersonController : MonoBehaviour, IDamageable
         }
     }
 
-    void HandleInteractionInput()
     public void HandleInteractionInput()
     {
         bool isInteracting = Physics.Raycast(playerCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit, interactionDistance, interactionLayer);
@@ -347,7 +287,6 @@ public class FirstPersonController : MonoBehaviour, IDamageable
     * camera will rotate around the body making it look like you dont move
     * at all from another person's perspective.
     */
-    private void HandleMouseLook()
     public void HandleMouseLook()
     {
         // Look Up/Down
@@ -359,7 +298,6 @@ public class FirstPersonController : MonoBehaviour, IDamageable
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeedX, 0);
     }
 
-    private void ApplyFinalMovements()
     public void ApplyFinalMovements()
     {
         if (!characterController.isGrounded)
@@ -407,16 +345,12 @@ public class FirstPersonController : MonoBehaviour, IDamageable
         return isCrouching;
     }
 
-    private void ApplyDamage(float dmg)
     public void ApplyDamage(float damage)
     {
-        currentHealth -= dmg;
-
         currentHealth -= damage;
         OnDamage?.Invoke(currentHealth);
 
         if (currentHealth <= 0)
-            KillPlayer();
         {
             SetPlayerState(new DeadState());
         }
@@ -425,8 +359,6 @@ public class FirstPersonController : MonoBehaviour, IDamageable
             SetPlayerState(new StunnedState());
         }
     }
-
-    private void KillPlayer()
 
     public void StunPlayer()
     {
@@ -438,7 +370,6 @@ public class FirstPersonController : MonoBehaviour, IDamageable
         }
     }
 
-    private void HandleStamina()
     public void HandleStamina()
     {
         if (IsSprinting && currentInput != Vector2.zero)

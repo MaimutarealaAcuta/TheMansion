@@ -12,7 +12,6 @@ public class Door : Interactable
     [SerializeField] private float colliderEnableThreshold = 5f;
 
     private Door otherDoorRef;
-    private bool isOpen = false;
     public bool isOpen = false;
     private bool isMoving = false;
     private Quaternion closedRotation;
@@ -49,12 +48,9 @@ public class Door : Interactable
 
     public override void OnInteract()
     {
-        
-
         if (!isMoving)
         {
             isOpen = !isOpen;
-            otherDoorRef.isOpen = isOpen;
             if (isDoubleDoor && otherDoor != null)
                 otherDoorRef.isOpen = isOpen;
             StartCoroutine(RotateDoors());
@@ -66,7 +62,6 @@ public class Door : Interactable
     private IEnumerator RotateDoors()
     {
         isMoving = true;
-        otherDoorRef.isMoving = true;
         if (isDoubleDoor && otherDoor != null)
             otherDoorRef.isMoving = true;
 
@@ -138,7 +133,6 @@ public class Door : Interactable
         }
 
         isMoving = false;
-        otherDoorRef.isMoving = false;
         if (isDoubleDoor && otherDoor != null)
             otherDoorRef.isMoving = false;
     }
