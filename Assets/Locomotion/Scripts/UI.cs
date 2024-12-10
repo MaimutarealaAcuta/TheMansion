@@ -24,7 +24,7 @@ public class UI : MonoBehaviour
 
     private void Start()
     {
-        UpdateHealth(100);
+        UpdateHealth(3);
         UpdateStamina(100);
     }
 
