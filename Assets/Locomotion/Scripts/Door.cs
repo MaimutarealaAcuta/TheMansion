@@ -49,7 +49,8 @@ public class Door : Interactable
         if (!isMoving)
         {
             isOpen = !isOpen;
-            otherDoorRef.isOpen = isOpen;
+            if (isDoubleDoor && otherDoor != null)
+                otherDoorRef.isOpen = isOpen;
             StartCoroutine(RotateDoors());
         }
 
@@ -59,7 +60,8 @@ public class Door : Interactable
     private IEnumerator RotateDoors()
     {
         isMoving = true;
-        otherDoorRef.isMoving = true;
+        if (isDoubleDoor && otherDoor != null)
+            otherDoorRef.isMoving = true;
 
         // Get colliders
         Collider mainCollider = GetComponent<Collider>();
@@ -129,7 +131,8 @@ public class Door : Interactable
         }
 
         isMoving = false;
-        otherDoorRef.isMoving = false;
+        if (isDoubleDoor && otherDoor != null)
+            otherDoorRef.isMoving = false;
     }
 
     public override void OnFocus()
