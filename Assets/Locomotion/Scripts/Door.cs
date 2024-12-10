@@ -13,6 +13,7 @@ public class Door : Interactable
 
     private Door otherDoorRef;
     private bool isOpen = false;
+    public bool isOpen = false;
     private bool isMoving = false;
     private Quaternion closedRotation;
     private Quaternion openRotation;
@@ -21,6 +22,10 @@ public class Door : Interactable
 
     private NavMeshObstacle navMeshObst;
 
+    public bool IsOpen
+    {
+        get { return isOpen; }
+    }
 
     private void Start()
     {
