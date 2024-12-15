@@ -5,6 +5,7 @@ public class Monster : Interactable
 {
     public static event Action OnMonsterCry;
     public static event Action OnMonsterScream;
+    public FirstPersonController player; 
 
     private bool isCarried = false;
     private bool isBurned = false;
@@ -55,10 +56,10 @@ public class Monster : Interactable
     private void AttachToPlayerHands()
     {
         // A transform on the player called "HoldPoint"
-        // Transform holdPoint = PlayerInventory.HoldPoint;
-        // transform.parent = holdPoint;
-        // transform.localPosition = Vector3.zero;
-        // transform.localRotation = Quaternion.identity;
+        Transform holdPoint = player.holdPoint;
+        transform.parent = holdPoint;
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
     }
 
     public void Burn()

@@ -111,6 +111,7 @@ public class FirstPersonController : MonoBehaviour, IDamageable
     [SerializeField] private float interactionDistance = default;
     [SerializeField] private LayerMask interactionLayer = default;
     private Interactable currentInteractable;
+    public Transform holdPoint;
 
     [Header("UI Elements")]
     public TextMeshProUGUI stunMessageText;
