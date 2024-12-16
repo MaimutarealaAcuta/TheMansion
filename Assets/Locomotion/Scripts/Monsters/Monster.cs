@@ -1,14 +1,16 @@
 using UnityEngine;
 using System;
 
-public class Monster : Interactable
+public class Monster : Interactable, IItem
 {
     public static event Action OnMonsterCry;
     public static event Action OnMonsterScream;
-    public FirstPersonController player; 
+    public FirstPersonController player;
 
     private bool isCarried = false;
     private bool isBurned = false;
+    private Collider col;
+    private Rigidbody rb;
 
     [Header("Monster Settings")]
     [SerializeField] private string monsterName = "Small Monster";
@@ -17,6 +19,15 @@ public class Monster : Interactable
     [SerializeField] private AudioClip crySound;
     [SerializeField] private AudioClip screamSound;
     [SerializeField] private AudioSource audioSource;
+
+    private MonsterPatrol patrol;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        col = rb.GetComponent<Collider>();
+        patrol = GetComponent<MonsterPatrol>();
+    }
 
     public override void OnFocus()
     {
@@ -43,23 +54,57 @@ public class Monster : Interactable
             if (audioSource && crySound)
                 audioSource.PlayOneShot(crySound);
 
+            // Stop movement via patrol system
+            if (patrol) patrol.PauseMovement();
+
             // Disable collider so it doesn’t interact with environment while carried
-            Collider col = GetComponent<Collider>();
             if (col) col.enabled = false;
 
-            // Optional: visually move the monster in front of the player’s camera/hands
-            // Implement a method to position it in player’s view
+            // Disable rigid body, so it does not fall from gravity
+            if (rb)
+            {
+                rb.isKinematic = true;
+                rb.useGravity = false;
+            }
+
+            // Visually move the monster in front of the player’s camera
             AttachToPlayerHands();
         }
     }
 
     private void AttachToPlayerHands()
     {
-        // A transform on the player called "HoldPoint"
         Transform holdPoint = player.holdPoint;
         transform.parent = holdPoint;
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
+    }
+
+    public void OnDrop()
+    {
+        if (isCarried && !isBurned)
+        {
+            isCarried = false;
+            transform.parent = null;
+            PlayerInventory.CurrentHeldObject = null;
+
+            // Re-enable the collider
+            if (col) col.enabled = true;
+
+            if (rb)
+            {
+                rb.isKinematic = false; // Allow physics to move it
+                rb.useGravity = true;   // Ensure gravity is on
+            }
+
+            // Place the monster slightly in front of the player at ground level
+            Vector3 dropPosition = player.transform.position + player.transform.forward * 1f;
+            dropPosition.y = player.transform.position.y; // Same height as player feet
+            transform.position = dropPosition;
+
+            // Run to next waypoint once dropped
+            if (patrol) patrol.RunToNextWaypoint();
+        }
     }
 
     public void Burn()
@@ -81,7 +126,12 @@ public class Monster : Interactable
                 audioSource.PlayOneShot(screamSound);
 
             // Destroy the monster after screaming (or after a delay)
-            Destroy(gameObject, 1f);
+            Destroy(gameObject, .2f);
         }
+    }
+
+    public void OnTake()
+    {
+        throw new NotImplementedException();
     }
 }

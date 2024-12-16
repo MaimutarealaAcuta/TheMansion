@@ -7,7 +7,6 @@ public class DamageTest : MonoBehaviour
         IDamageable damageable = other.GetComponent<IDamageable>();
         if (damageable != null)
         {
-            FirstPersonController.OnTakeDamage(15);
             damageable.ApplyDamage(1);
         }
     }

@@ -1,7 +1,10 @@
 
+using UnityEngine;
+
 public class NeutralState : IPlayerState
 {
     private FirstPersonController player;
+    private KeyCode dropKey = KeyCode.G;
 
     public void EnterState(FirstPersonController player)
     {
@@ -31,6 +34,7 @@ public class NeutralState : IPlayerState
         {
             player.HandleInteractionCheck();
             player.HandleInteractionInput();
+            HandleOtherTypesOfInteraction();
         }
 
         if (player.useStamina)
@@ -44,5 +48,15 @@ public class NeutralState : IPlayerState
     public void ExitState()
     {
         // Any cleanup when exiting Neutral state
+    }
+
+    private void HandleOtherTypesOfInteraction()
+    {
+        if (Input.GetKeyDown(dropKey) && PlayerInventory.CurrentHeldObject != null)
+        {
+            PlayerInventory.CurrentHeldObject.TryGetComponent<IItem>(out IItem heldItem);
+            heldItem?.OnDrop();
+        }
+
     }
 }
