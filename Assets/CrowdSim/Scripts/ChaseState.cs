@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.AI;
 
 public class ChaseState : EnemyState
@@ -31,10 +28,7 @@ public class ChaseState : EnemyState
         if (!enemy.navMeshAgent.enabled)
             enemy.navMeshAgent.enabled = true;
 
-
         enemy.enemyMovement.isMoving = true;
-
-        
 
         print("is moving nav: " + enemy.navMeshAgent.isStopped);
         //OPTION 1
@@ -56,9 +50,4 @@ public class ChaseState : EnemyState
 
         return this;
     }
-
-   
 }
-
-   
-

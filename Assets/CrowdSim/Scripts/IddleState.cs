@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class IddleState : EnemyState
 {
-
     public ChaseState chaseState;
     public bool canSeeThePlayer;
 
@@ -24,17 +21,12 @@ public class IddleState : EnemyState
 
     public override EnemyState RunCurrentState(EnemyManager enemy)
     {
-        //print("Idle");
-
         if (enemy.fov.canSeePlayer)
         {
-
             return chaseState;
         }
         else
         {
-
-            
             if (!isWaiting)
             {
                 idleTime = Random.Range(2f, 10f);
@@ -59,15 +51,10 @@ public class IddleState : EnemyState
                 return patrolState; // Switch to patrol state
             }
 
-
             //enemy.enemyMovement.speed = 0;
             enemy.navMeshAgent.speed = 0;
             // Remain in the idle state until time is up
             return this;
-
-            
         }
     }
-    
-  
 }

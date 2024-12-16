@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -28,7 +27,6 @@ public class PatrolState : EnemyState
             return chaseState;
         }
 
-
         ////Switch to idle state once the patrol time limit is reached
         //patrolTimer += Time.deltaTime;
         //if (patrolTimer >= patrolTimeLimit)
@@ -44,8 +42,6 @@ public class PatrolState : EnemyState
         {
             enemy.navMeshAgent.SetDestination(waypoints[waypointIndex].transform.position);
             waypointIndex++;
-
-            
         }
         enemy.enemyMovement.isMoving = true;
 
@@ -80,13 +76,6 @@ public class PatrolState : EnemyState
             return idleState;
         }
 
-
-
-
-        
-
         return this;
-        
     }
-
 }

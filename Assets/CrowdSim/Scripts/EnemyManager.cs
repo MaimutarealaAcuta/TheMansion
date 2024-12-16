@@ -9,15 +9,12 @@ public class EnemyManager : MonoBehaviour
     public NavMeshAgent navMeshAgent;
     public GameObject target;
 
-    [SerializeField] StateManager stateManager;
     [SerializeField] EnemyState currentState;
 
     [Header("States")]
     [SerializeField] IddleState idle;
     [SerializeField] ChaseState chase;
     [SerializeField] PatrolState patrol;
-    //attack
-
 
     public EnemyMovement enemyMovement;
     public FieldOfView fov;
@@ -26,7 +23,6 @@ public class EnemyManager : MonoBehaviour
 
     private void Awake()
     {
-        stateManager = GetComponent<StateManager>();
         navMeshAgent = GetComponentInChildren<NavMeshAgent>();
 
         currentState = patrol;
@@ -38,13 +34,6 @@ public class EnemyManager : MonoBehaviour
         fov = GetComponent<FieldOfView>();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
         RunStateMachine();
@@ -52,12 +41,8 @@ public class EnemyManager : MonoBehaviour
 
     public void RunStateMachine()
     {
-
-       
         Vector3 agentPosition = navMeshAgent.transform.position;
         Quaternion agentRotation = navMeshAgent.transform.rotation;
-
-        
 
         EnemyState nextState = currentState?.RunCurrentState(this);
         //print("current state: "+currentState);
@@ -105,9 +90,6 @@ public class EnemyManager : MonoBehaviour
 
             enemyMovement.isMoving = false;
         }
-
-
-      
     }
 
     private void SwitchToTheNextState(EnemyState nextState)
@@ -116,6 +98,5 @@ public class EnemyManager : MonoBehaviour
         currentState = nextState;
         //animator.SetFloat("Speed", enemyMovement.speed);
         animator.SetFloat("Speed", navMeshAgent.speed);
-
     }
 }

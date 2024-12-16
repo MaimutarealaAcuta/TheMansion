@@ -7,13 +7,12 @@ public class EnemyMovement : MonoBehaviour
     CharacterController rb;
     public float speed = 5f;
     public bool isMoving;
-    // Start is called before the first frame update
+
     void Start()
     {
         rb = GetComponent<CharacterController>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         //float x = Input.GetAxis("Horizontal");
