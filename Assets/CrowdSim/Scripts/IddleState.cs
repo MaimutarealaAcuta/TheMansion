@@ -3,21 +3,11 @@ using UnityEngine;
 public class IddleState : EnemyState
 {
     public ChaseState chaseState;
-    public bool canSeeThePlayer;
-
     public PatrolState patrolState;
 
-    private EnemyState state;
-
-    private float idleTime;             // Time to stay idle
-    private float idleTimer = 0;        // Timer to track idle duration
+    private float idleTime;
+    private float idleTimer = 0;
     private bool isWaiting = false;
-
-    private void Start()
-    {
-        print(gameObject.name);
-
-    }
 
     public override EnemyState RunCurrentState(EnemyManager enemy)
     {
@@ -31,29 +21,22 @@ public class IddleState : EnemyState
             {
                 idleTime = Random.Range(2f, 10f);
                 print("idle time: " + idleTime);
-                idleTimer = 0; // Reset the timer
+                idleTimer = 0;
                 isWaiting = true;
-                //enemy.navMeshAgent.destination = enemy.transform.position;
                 enemy.enemyMovement.isMoving = false;
-               
             }
 
-            // Increment the timer
             idleTimer += Time.deltaTime;
-            //print(idleTime);
-            //print(idleTimer);
-            // Check if the idle time has elapsed
+
             if (idleTimer >= idleTime)
             {
                 print("please do patrol from idle");
                 isWaiting = false;
                 enemy.enemyMovement.isMoving = true;
-                return patrolState; // Switch to patrol state
+                return patrolState;
             }
 
-            //enemy.enemyMovement.speed = 0;
             enemy.navMeshAgent.speed = 0;
-            // Remain in the idle state until time is up
             return this;
         }
     }

@@ -1,53 +1,84 @@
+using UnityEngine;
 using UnityEngine.AI;
 
 public class ChaseState : EnemyState
 {
-    public bool isInAttackRange;
     public IddleState idleState;
     public PatrolState patrolState;
+    public AttackState attackState;
+
+    public EnemyManager enemyManager;
+    private bool playerCollided = false;
+
+    private void OnTriggerEnter(Collider other)
+    {
+        FirstPersonController player = other.GetComponent<FirstPersonController>();
+        if (player == null) return;
+
+        if (enemyManager.currentState == this) // Only respond if currently in chase state
+        {
+            IDamageable damageable = player.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                // Store the damageable target in the EnemyManager so AttackState can access it
+                enemyManager.lastDamageableTarget = damageable;
+                playerCollided = true; // Mark that we hit the player
+            }
+        }
+    }
 
     public override EnemyState RunCurrentState(EnemyManager enemy)
     {
-        print("chase");
-
-        if (isInAttackRange)
+        // If we collided with the player, switch to attack state
+        if (playerCollided)
         {
-            print("will Attack");
-            return this; // should return an AttackState object
+            playerCollided = false;
+            return attackState;
         }
-        else if(enemy.isPerformingAction)
+
+        // If we have a last known position from the monster being carried
+        if (enemy.isTrackingPlayer && enemy.GetLastKnownPlayerPosition().HasValue)
         {
+            Vector3 destination = enemy.GetLastKnownPlayerPosition().Value;
+
+            if (!enemy.navMeshAgent.enabled)
+                enemy.navMeshAgent.enabled = true;
+
+            enemy.enemyMovement.isMoving = true;
+            enemy.navMeshAgent.SetDestination(destination);
+            enemy.navMeshAgent.speed = 4.1f;
+
+            // If can't see player and have reached destination, maybe revert to patrol
+            if (!enemy.fov.canSeePlayer)
+            {
+                float distance = Vector3.Distance(enemy.transform.position, destination);
+                if (distance < enemy.navMeshAgent.stoppingDistance + 0.5f)
+                {
+                    return patrolState;
+                }
+            }
+
+            // Remain in chase
             return this;
         }
-        else if (!enemy.fov.canSeePlayer)
+        else
         {
-            print("cant see");
-            return patrolState;
+            // If no tracking info from the monster and we can’t see the player, go back to patrol
+            if (!enemy.fov.canSeePlayer)
+            {
+                return patrolState;
+            }
+
+            // If we do see the player normally, chase them
+            enemy.enemyMovement.isMoving = true;
+            if (!enemy.navMeshAgent.enabled)
+                enemy.navMeshAgent.enabled = true;
+
+            enemy.navMeshAgent.SetDestination(enemy.target.transform.position);
+            enemy.navMeshAgent.speed = 4.1f;
+
+            // Remain in chase
+            return this;
         }
-
-        if (!enemy.navMeshAgent.enabled)
-            enemy.navMeshAgent.enabled = true;
-
-        enemy.enemyMovement.isMoving = true;
-
-        print("is moving nav: " + enemy.navMeshAgent.isStopped);
-        //OPTION 1
-        //enemy.navMeshAgent.SetDestination(enemy.target.transform.position); //is asynchronous, can be costly if path is very long
-
-        //OPTION 2
-        NavMeshPath path = new NavMeshPath();
-   
-        enemy.navMeshAgent.CalculatePath(enemy.target.transform.position, path);
-        enemy.navMeshAgent.SetPath(path);
-        
-        //enemy.navMeshAgent.Move(transform.forward*Time.deltaTime*5);
-
-        //enemy.enemyMovement.RotateTowardsAgent(enemy.navMeshAgent.transform.rotation);
-
-
-        //enemy.enemyMovement.speed = 5;
-        enemy.navMeshAgent.speed = 4.1f;
-
-        return this;
     }
 }

@@ -4,7 +4,6 @@ using UnityEngine;
 public class FieldOfView : MonoBehaviour
 {
     public float radius;
-
     private float normalRadius;
     private float crouchRadius;
 
@@ -20,7 +19,7 @@ public class FieldOfView : MonoBehaviour
     public bool canSeePlayer = false;
     FirstPersonController playerControler;
 
-    private float playerHeightOffset = 1.5f; // Adjust this to the height of the player’s head
+    private float playerHeightOffset = 1.5f; // Adjust if needed
 
     private void Start()
     {
@@ -41,11 +40,7 @@ public class FieldOfView : MonoBehaviour
         {
             yield return wait;
 
-            if (playerControler.IsCrouching())
-                radius = crouchRadius;
-            else
-                radius = normalRadius;
-
+            radius = playerControler.IsCrouching() ? crouchRadius : normalRadius;
             FieldOfViewCheck();
         }
     }
@@ -59,30 +54,22 @@ public class FieldOfView : MonoBehaviour
             Transform target = rangeChecks[0].transform;
             Vector3 directionToTarget = (target.position - transform.position).normalized;
 
-            // Check if the player is within the angle of view
             if (Vector3.Angle(transform.forward, directionToTarget) < angle / 2)
             {
                 float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
-                // Perform the first raycast to the player's center position
+                // Raycast to player's center
                 if (!Physics.Raycast(transform.position + new Vector3(0, rayHeight, 0), directionToTarget, distanceToTarget, obstructionMask | interactableMask))
                 {
                     canSeePlayer = true;
                 }
                 else
                 {
-                    // Perform a second raycast to the player’s head position to see over shorter obstacles
+                    // Raycast to player's head
                     Vector3 headPosition = playerRef.transform.position + new Vector3(0, playerHeightOffset, 0);
                     Vector3 directionToHead = (headPosition - transform.position).normalized;
 
-                    if (!Physics.Raycast(transform.position + new Vector3(0, rayHeight, 0), directionToHead, distanceToTarget, obstructionMask | interactableMask))
-                    {
-                        canSeePlayer = true;
-                    }
-                    else
-                    {
-                        canSeePlayer = false;
-                    }
+                    canSeePlayer = !Physics.Raycast(transform.position + new Vector3(0, rayHeight, 0), directionToHead, distanceToTarget, obstructionMask | interactableMask);
                 }
             }
             else
