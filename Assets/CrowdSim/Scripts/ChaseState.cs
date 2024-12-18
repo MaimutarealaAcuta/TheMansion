@@ -9,6 +9,19 @@ public class ChaseState : EnemyState
     public IddleState idleState;
     public PatrolState patrolState;
 
+
+    private float currentSpeed; // Tracks current speed
+    public float maxSpeed = 4.1f; // Maximum speed
+    public float accelerationRate = 1f; // Rate of speed increase per second
+    public float startingSpeed = 1f; // Initial speed
+
+
+    private void Start()
+    {
+        currentSpeed = startingSpeed;
+    }
+
+
     public override EnemyState RunCurrentState(EnemyManager enemy)
     {
         print("chase");
@@ -52,7 +65,10 @@ public class ChaseState : EnemyState
 
 
         //enemy.enemyMovement.speed = 5;
-        enemy.navMeshAgent.speed = 4.1f;
+        //enemy.navMeshAgent.speed = 4.1f;
+
+        currentSpeed = Mathf.Min(currentSpeed + accelerationRate * Time.deltaTime, maxSpeed);
+        enemy.navMeshAgent.speed = currentSpeed;
 
         return this;
     }
