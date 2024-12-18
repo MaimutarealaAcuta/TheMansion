@@ -1,3 +1,4 @@
+using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -108,6 +109,22 @@ public class EnemyManager : MonoBehaviour
     private void SwitchToTheNextState(EnemyState nextState)
     {
         currentState = nextState;
-        animator.SetFloat("Speed", navMeshAgent.speed);
+        string trigger = AnimationTriggerName(nextState);
+        animator.SetTrigger(trigger);
+    }
+
+    private string AnimationTriggerName(EnemyState nextState)
+    {
+        switch (nextState)
+        {
+            case IddleState _:
+                return "Idle";
+            case PatrolState _:
+                return "Patrol";
+            case ChaseState _:
+                return "Chase";
+            default:
+                return "Idle";
+        }
     }
 }

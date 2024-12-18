@@ -10,6 +10,16 @@ public class ChaseState : EnemyState
     public EnemyManager enemyManager;
     private bool playerCollided = false;
 
+    private float currentSpeed; // Tracks current speed
+    public float maxSpeed = 4.1f; // Maximum speed
+    public float accelerationRate = 1f; // Rate of speed increase per second
+    public float startingSpeed = 2.5f; // Initial speed
+
+    private void Start()
+    {
+        currentSpeed = startingSpeed;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         FirstPersonController player = other.GetComponent<FirstPersonController>();
@@ -76,6 +86,9 @@ public class ChaseState : EnemyState
 
             enemy.navMeshAgent.SetDestination(enemy.target.transform.position);
             enemy.navMeshAgent.speed = 4.1f;
+
+            currentSpeed = Mathf.Min(currentSpeed + accelerationRate * Time.deltaTime, maxSpeed);
+            enemy.navMeshAgent.speed = currentSpeed;
 
             // Remain in chase
             return this;
