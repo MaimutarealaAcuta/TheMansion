@@ -21,7 +21,6 @@ public class PatrolState : EnemyState
             return chaseState;
         }
 
-        print("remaining distance" + enemy.navMeshAgent.remainingDistance);
 
         if (waypointIndex == 0)
         {
@@ -30,16 +29,13 @@ public class PatrolState : EnemyState
         }
 
         enemy.enemyMovement.isMoving = true;
-        print("remaining distance" + enemy.navMeshAgent.remainingDistance);
 
         // When the agent reaches the current waypoint, choose a new one and then go idle
         if (enemy.navMeshAgent.remainingDistance <= enemy.navMeshAgent.stoppingDistance)
         {
-            print(waypoints.Count + " " + waypointIndex);
             NavMeshPath path = new NavMeshPath();
             enemy.navMeshAgent.CalculatePath(waypoints[waypointIndex].position, path);
             enemy.navMeshAgent.SetPath(path);
-            print(waypoints.Count);
 
             waypointIndexOld = waypointIndex;
             waypointIndex = Random.Range(0, waypoints.Count);

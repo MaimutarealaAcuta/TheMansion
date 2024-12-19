@@ -51,7 +51,7 @@ public class MonsterPatrol : MonoBehaviour
                     agent.speed = normalSpeed;
                     wasJustDropped = false;
                 }
-                ChooseNextWaypoint();
+                 ChooseNextWaypoint();
             }
         }
     }

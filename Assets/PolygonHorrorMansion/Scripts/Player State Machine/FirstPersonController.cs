@@ -174,11 +174,10 @@ public class FirstPersonController : MonoBehaviour, IDamageable
         Vector3 rayEnd = rayStart + direction * ladderGrabDistance;
 
         // Visualize the ray in the Scene view
-        Debug.DrawLine(rayStart, rayEnd, Color.red, 5f);
+        //Debug.DrawLine(rayStart, rayEnd, Color.red, 5f);
 
         if (Physics.Raycast(transform.position + Vector3.up * avoidFloorDistance, direction, out RaycastHit raycastHit, ladderGrabDistance))
         {
-            print(raycastHit.transform);
             if (raycastHit.transform.TryGetComponent(out Ladder ladder))
             {
                 moveDirection.y = new Vector3(moveDirection.x, 0, moveDirection.z).magnitude;

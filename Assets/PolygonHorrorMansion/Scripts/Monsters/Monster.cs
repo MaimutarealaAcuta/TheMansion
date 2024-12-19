@@ -145,6 +145,9 @@ public class Monster : Interactable, IItem
             // Stop updating position once dropped
             StopUpdatingPosition();
 
+            // Increment burned monsters counter
+            PlayerInventory.monstersBurned++;
+
             // Destroy the monster after screaming (or after a delay)
             Destroy(gameObject, .2f);
         }

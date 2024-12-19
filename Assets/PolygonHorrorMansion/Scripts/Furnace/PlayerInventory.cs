@@ -10,6 +10,9 @@ public static class PlayerInventory
     private static int woodCount = 15;
     private static int woodAmount = 0;
 
+    public static bool hasWoodenSpike = false;
+    public static int monstersBurned = 0;
+
     public static bool HasWood(int amount)
     {
         return woodAmount >= amount;

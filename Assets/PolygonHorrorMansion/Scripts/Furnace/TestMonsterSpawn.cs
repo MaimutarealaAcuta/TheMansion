@@ -1,25 +1,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestMonsterSpawn : Interactable
+public class TestMonsterSpawn : MonoBehaviour
 {
-    [SerializeField] List<GameObject> monstersList = new List<GameObject>();
+    [SerializeField] private List<GameObject> monstersList = new List<GameObject>();
+    [SerializeField] private string playerTag = "Player";
 
-    public override void OnInteract()
+    private bool triggered = false;
+
+    private void OnTriggerEnter(Collider other)
     {
-        for (int i = 0; i < monstersList.Count; i++)
+        // Check if the object entering the trigger is the player and we haven't triggered yet
+        if (!triggered && other.CompareTag(playerTag))
         {
-            monstersList[i].GetComponent<MonsterPatrol>().StartMovementFromPause();
+            triggered = true;
+
+            // Activate all monsters by starting their movement
+            for (int i = 0; i < monstersList.Count; i++)
+            {
+                if (monstersList[i] != null)
+                {
+                    MonsterPatrol patrol = monstersList[i].GetComponent<MonsterPatrol>();
+                    if (patrol != null)
+                    {
+                        patrol.StartMovementFromPause();
+                    }
+                }
+            }
+
+            // Destroy this trigger so it only happens once
+            Destroy(gameObject);
         }
-    }
-
-    public override void OnFocus()
-    {
-        
-    }
-
-    public override void OnLoseFocus()
-    {
-        
     }
 }
