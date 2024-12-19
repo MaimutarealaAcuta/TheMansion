@@ -5,7 +5,8 @@ public class Furnace : Interactable
     [Header("Fireplace Settings")]
     [SerializeField] public Door furnanceDoor;
     [SerializeField] private bool isLoaded = false;
-    [SerializeField] private GameObject woodStack;  // Visual representation for loaded with wood
+    [SerializeField] private GameObject woodStack;
+    [SerializeField] private GameObject fireLight;
 
     [Header("Wood Requirements")]
     [SerializeField] private int requiredWood = 6;
@@ -106,6 +107,7 @@ public class Furnace : Interactable
         if (woodStack != null)
         {
             woodStack.SetActive(isLoaded);
+            fireLight.SetActive(isLoaded);
         }
     }
 }

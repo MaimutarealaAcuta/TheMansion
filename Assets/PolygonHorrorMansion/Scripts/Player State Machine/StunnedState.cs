@@ -12,6 +12,13 @@ public class StunnedState : IPlayerState
         this.player = player;
         player.CanMove = false;
 
+        // If the player is holding a monster and get caught, drops it
+        if (PlayerInventory.CurrentHeldObject != null)
+        {
+            PlayerInventory.CurrentHeldObject.TryGetComponent<IItem>(out IItem heldItem);
+            heldItem?.OnDrop();
+        }
+
         // Enable the stun message text and start flickering
         if (player.stunMessageText != null)
         {

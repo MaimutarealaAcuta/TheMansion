@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
     [Header("UI Info")]
     [SerializeField] private TextMeshProUGUI healthText = default;
     [SerializeField] private TextMeshProUGUI staminaText = default;
+    [SerializeField] private TextMeshProUGUI woodText = default;
 
     [Header("Message Display Settings")]
     [SerializeField] private TextMeshProUGUI infoMessage;
@@ -45,6 +46,7 @@ public class UIManager : MonoBehaviour
         FirstPersonController.OnDamage += UpdateHealth;
         FirstPersonController.OnHeal += UpdateHealth;
         FirstPersonController.OnStaminaChange += UpdateStamina;
+        PlayerInventory.OnWoodCountChange += UpdateWoodCount;
     }
 
     private void OnDisable()
@@ -54,22 +56,29 @@ public class UIManager : MonoBehaviour
         FirstPersonController.OnDamage -= UpdateHealth;
         FirstPersonController.OnHeal -= UpdateHealth;
         FirstPersonController.OnStaminaChange -= UpdateStamina;
+        PlayerInventory.OnWoodCountChange -= UpdateWoodCount;
     }
 
     private void Start()
     {
         UpdateHealth(3);
         UpdateStamina(100);
+        UpdateWoodCount(0);
     }
 
     private void UpdateHealth(float currentHealth)
     {
-        healthText.text = currentHealth.ToString("00");
+        healthText.text = "Health: " + currentHealth.ToString();
     }
 
     private void UpdateStamina(float currentStamina)
     {
-        staminaText.text = currentStamina.ToString("00");
+        staminaText.text = "Stamina: " + currentStamina.ToString("00");
+    }
+
+    private void UpdateWoodCount(int woodCount)
+    {
+        woodText.text = "Wood: " + woodCount.ToString();
     }
 
     /// <summary>

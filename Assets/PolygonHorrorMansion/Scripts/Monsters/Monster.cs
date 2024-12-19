@@ -34,6 +34,8 @@ public class Monster : Interactable, IItem
 
     public override void OnFocus()
     {
+        if (UIManager.Instance.IsDisplayingMessage) return;
+
         UIManager.Instance.ShowMessage("Interact to pick up monster");
     }
 
@@ -46,6 +48,12 @@ public class Monster : Interactable, IItem
     {
         if (!isCarried && !isBurned)
         {
+            if (PlayerInventory.CurrentHeldObject)
+            {
+                UIManager.Instance.ShowMessage("You cannot carry more than one 'Minion'");
+                return;
+            }
+
             // Pick up the monster
             isCarried = true;
             PlayerInventory.CurrentHeldObject = this.gameObject;

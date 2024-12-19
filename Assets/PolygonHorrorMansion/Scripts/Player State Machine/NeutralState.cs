@@ -57,6 +57,5 @@ public class NeutralState : IPlayerState
             PlayerInventory.CurrentHeldObject.TryGetComponent<IItem>(out IItem heldItem);
             heldItem?.OnDrop();
         }
-
     }
 }
