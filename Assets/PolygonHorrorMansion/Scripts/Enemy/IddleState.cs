@@ -20,7 +20,6 @@ public class IddleState : EnemyState
             if (!isWaiting)
             {
                 idleTime = Random.Range(2f, 10f);
-                print("idle time: " + idleTime);
                 idleTimer = 0;
                 isWaiting = true;
                 enemy.enemyMovement.isMoving = false;
@@ -30,7 +29,6 @@ public class IddleState : EnemyState
 
             if (idleTimer >= idleTime)
             {
-                print("please do patrol from idle");
                 isWaiting = false;
                 enemy.enemyMovement.isMoving = true;
                 return patrolState;

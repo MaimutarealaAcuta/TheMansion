@@ -86,6 +86,7 @@ public class FirstPersonController : MonoBehaviour, IDamageable
     [SerializeField] private AudioSource footstepAudioSource = default;
     [SerializeField] private AudioClip[] woodClips = default;
     [SerializeField] private AudioClip[] grassClips = default;
+    [SerializeField] private AudioClip[] gravelClips = default;
     private float footstepTimer = 0;
     private float GetCurrentOffset => isCrouching ? baseStepSpeed * crouchStepMultipler : IsSprinting ? baseStepSpeed * sprintStepMultipler : baseStepSpeed;
 
@@ -170,12 +171,6 @@ public class FirstPersonController : MonoBehaviour, IDamageable
 
         var direction = new Vector3(moveDirection.x, 0, moveDirection.z).normalized;
 
-        Vector3 rayStart = transform.position + Vector3.up * avoidFloorDistance;
-        Vector3 rayEnd = rayStart + direction * ladderGrabDistance;
-
-        // Visualize the ray in the Scene view
-        //Debug.DrawLine(rayStart, rayEnd, Color.red, 5f);
-
         if (Physics.Raycast(transform.position + Vector3.up * avoidFloorDistance, direction, out RaycastHit raycastHit, ladderGrabDistance))
         {
             if (raycastHit.transform.TryGetComponent(out Ladder ladder))
@@ -234,7 +229,10 @@ public class FirstPersonController : MonoBehaviour, IDamageable
                         footstepAudioSource.PlayOneShot(woodClips[UnityEngine.Random.Range(0, woodClips.Length - 1)]);
                         break;
                     case "Footsteps/Grass":
-                        footstepAudioSource.PlayOneShot(grassClips[UnityEngine.Random.Range(0, woodClips.Length - 1)]);
+                        footstepAudioSource.PlayOneShot(grassClips[UnityEngine.Random.Range(0, grassClips.Length - 1)]);
+                        break;
+                    case "Footsteps/Gravel":
+                        footstepAudioSource.PlayOneShot(gravelClips[UnityEngine.Random.Range(0, gravelClips.Length - 1)]);
                         break;
                     default:
                         break;
@@ -247,27 +245,50 @@ public class FirstPersonController : MonoBehaviour, IDamageable
 
     public void HandleInteractionCheck()
     {
+        // Raycast to find what we hit
         if (Physics.Raycast(playerCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit, interactionDistance))
         {
-            bool isInteractableDefinedOrDifferent = (currentInteractable == null || hit.collider.gameObject.GetInstanceID() != currentInteractable.GetInstanceID());
-            bool isInteractableLayer = hit.collider.gameObject.layer == 7; // Layer 7 is for Interactables
+            // Attempt to get the Interactable from the hit
+            bool isInteractableLayer = hit.collider.gameObject.layer == 7; // Interactable layer
+            Interactable newInteractable = null;
 
-            if (isInteractableLayer && isInteractableDefinedOrDifferent)
+            if (isInteractableLayer)
             {
-                hit.collider.TryGetComponent(out currentInteractable);
+                // Try to get the Interactable component
+                hit.collider.TryGetComponent(out newInteractable);
+            }
 
-                if (currentInteractable)
+            // If the new interactable is different from our current one,
+            // we handle the lose focus on the old, and the focus on the new.
+            if (newInteractable != currentInteractable)
+            {
+                // If we already had one focused, lose focus first
+                if (currentInteractable != null)
+                {
+                    currentInteractable.OnLoseFocus();
+                }
+
+                // Update to the new interactable (could be null if we didn't find anything)
+                currentInteractable = newInteractable;
+
+                // Focus the new one if it's valid
+                if (currentInteractable != null)
                 {
                     currentInteractable.OnFocus();
                 }
             }
-            else if (currentInteractable)
+        }
+        else
+        {
+            // If we didn't hit anything, but we currently have an interactable, lose focus
+            if (currentInteractable != null)
             {
                 currentInteractable.OnLoseFocus();
                 currentInteractable = null;
             }
         }
     }
+
 
     public void HandleInteractionInput()
     {
@@ -289,6 +310,8 @@ public class FirstPersonController : MonoBehaviour, IDamageable
     */
     public void HandleMouseLook()
     {
+        if (!CanMove) return;
+
         // Look Up/Down
         rotationX -= Input.GetAxis("Mouse Y") * lookSpeedY;
         rotationX = Mathf.Clamp(rotationX, -upperLookLimit, lowerLookLimit);
@@ -300,6 +323,8 @@ public class FirstPersonController : MonoBehaviour, IDamageable
 
     public void ApplyFinalMovements()
     {
+        if (!CanMove) return;
+
         if (!characterController.isGrounded)
             moveDirection.y -= gravity * Time.deltaTime;
 

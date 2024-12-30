@@ -11,6 +11,15 @@ public class Door : Interactable
     [SerializeField] private float openSpeed = 2f;
     [SerializeField] private float colliderEnableThreshold = 5f;
 
+    [Header("Lock Settings")]
+    [SerializeField] public bool requireKey = false;
+    [SerializeField] private string requiredKeyName = "Main Door";
+
+    [Header("Sound Settings")]
+    [SerializeField] private string closedDoorSound = "closed_door";
+    [SerializeField] private string openDoorSound = "open_door";
+    [SerializeField] private string closeDoorSound = "close_door";
+
     private Door otherDoorRef;
     public bool isOpen = false;
     private bool isMoving = false;
@@ -48,6 +57,25 @@ public class Door : Interactable
 
     public override void OnInteract()
     {
+        // If the door requires a key, check if player has it
+        if (requireKey)
+        {
+            if (!PlayerInventory.HasKey(requiredKeyName))
+            {
+                SoundManager.Instance.PlaySFX(closedDoorSound);
+
+                UIManager.Instance.ShowMessage($"You need the '{requiredKeyName}' key to open this door");
+
+                return;
+            }
+            // After opening a door for the 1st time with a key, you dont need the key anymore
+            requireKey = false;
+            if (isDoubleDoor && otherDoor != null)
+                otherDoorRef.requireKey = false;
+        }
+
+        // If we reach here, either no key is required or the player has the correct key
+
         if (!isMoving)
         {
             isOpen = !isOpen;
@@ -55,8 +83,6 @@ public class Door : Interactable
                 otherDoorRef.isOpen = isOpen;
             StartCoroutine(RotateDoors());
         }
-
-
     }
 
     private IEnumerator RotateDoors()
@@ -64,6 +90,8 @@ public class Door : Interactable
         isMoving = true;
         if (isDoubleDoor && otherDoor != null)
             otherDoorRef.isMoving = true;
+
+        SoundManager.Instance.PlaySFX(isOpen ? openDoorSound : closeDoorSound);
 
         // Get colliders
         Collider mainCollider = GetComponent<Collider>();
@@ -118,12 +146,11 @@ public class Door : Interactable
             {
                 navMeshObst.enabled = !navMeshObst.enabled;
                 navMeshChanged = true;
-                print("navmeshchanged");
             }
 
             yield return null;
         }
-        while (remainingAngle > 0.1f);
+        while (remainingAngle > 0.2f);
 
         // Final snap to target rotations
         transform.rotation = targetRotation;

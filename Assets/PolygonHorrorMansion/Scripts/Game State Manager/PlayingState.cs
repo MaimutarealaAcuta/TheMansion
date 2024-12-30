@@ -1,11 +1,13 @@
 public class PlayingState : IGameState
 {
     private GameStateManager gameManager;
+    private readonly string bgMusicName = "bg_music";
 
     public void EnterState(GameStateManager gameManager)
     {
         this.gameManager = gameManager;
-        // Any setup for playing state
+
+        SoundManager.Instance.PlayBGM(bgMusicName);
     }
 
     public void UpdateState()
@@ -15,6 +17,6 @@ public class PlayingState : IGameState
 
     public void ExitState()
     {
-        // Any cleanup when exiting playing state
+        SoundManager.Instance.StopBGM();
     }
 }

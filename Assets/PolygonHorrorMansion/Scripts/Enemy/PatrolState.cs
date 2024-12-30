@@ -17,7 +17,6 @@ public class PatrolState : EnemyState
 
         if (enemy.fov.canSeePlayer)
         {
-            print("chase");
             return chaseState;
         }
 
@@ -45,7 +44,6 @@ public class PatrolState : EnemyState
                 waypointIndex++;
             }
 
-            print("will return idle");
             enemy.enemyMovement.isMoving = false;
             return idleState;
         }

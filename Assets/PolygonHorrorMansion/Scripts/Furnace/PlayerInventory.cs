@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class PlayerInventory
@@ -12,6 +13,8 @@ public static class PlayerInventory
 
     public static bool hasWoodenSpike = false;
     public static int monstersBurned = 0;
+
+    private static List<string> keys = new List<string>();
 
     public static bool HasWood(int amount)
     {
@@ -39,5 +42,29 @@ public static class PlayerInventory
     {
         woodAmount = Mathf.Max(0, woodAmount - amount);
         OnWoodCountChange?.Invoke(woodAmount);
+    }
+
+    public static bool HasKey(string keyName)
+    {
+        return keys.Contains(keyName);
+    }
+
+    public static void AddKey(string keyName)
+    {
+        if (!keys.Contains(keyName))
+        {
+            keys.Add(keyName);
+        }
+    }
+
+    public static bool UseKey(string keyName)
+    {
+        // If you want to remove the key after using it
+        if (keys.Contains(keyName))
+        {
+            keys.Remove(keyName);
+            return true;
+        }
+        return false;
     }
 }

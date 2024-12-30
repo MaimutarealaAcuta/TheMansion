@@ -25,7 +25,7 @@ public class Monster : Interactable, IItem
     private MonsterPatrol patrol;
     private bool updatePositionRunning = false;
 
-    private void Awake()
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
         col = rb.GetComponent<Collider>();
@@ -34,6 +34,8 @@ public class Monster : Interactable, IItem
 
     public override void OnFocus()
     {
+        base.OnFocus();
+
         if (UIManager.Instance.IsDisplayingMessage) return;
 
         UIManager.Instance.ShowMessage("Interact to pick up monster");
@@ -41,6 +43,8 @@ public class Monster : Interactable, IItem
 
     public override void OnLoseFocus()
     {
+        base.OnLoseFocus();
+
         UIManager.Instance.HideMessage();
     }
 
@@ -68,7 +72,7 @@ public class Monster : Interactable, IItem
             // Stop movement via patrol system
             if (patrol) patrol.PauseMovement();
 
-            // Disable collider so it doesn’t interact with environment while carried
+            // Disable collider so it doesnï¿½t interact with environment while carried
             if (col) col.enabled = false;
 
             // Disable rigid body, so it does not fall from gravity
@@ -78,7 +82,7 @@ public class Monster : Interactable, IItem
                 rb.useGravity = false;
             }
 
-            // Visually move the monster in front of the player’s camera
+            // Visually move the monster in front of the playerï¿½s camera
             AttachToPlayerHands();
 
             // Start sending player's position updates
@@ -177,7 +181,7 @@ public class Monster : Interactable, IItem
     {
         while (updatePositionRunning && player != null)
         {
-            // Invoke event with player’s current position
+            // Invoke event with playerï¿½s current position
             OnMonsterCarriedUpdate?.Invoke(player.transform.position);
             yield return new WaitForSeconds(0.5f); // Update every half second
         }

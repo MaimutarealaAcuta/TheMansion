@@ -21,6 +21,8 @@ public class Wood : Interactable
 
     public override void OnFocus()
     {
+        base.OnFocus();
+
         if (UIManager.Instance.IsDisplayingMessage) return;
 
         UIManager.Instance.ShowMessage("Gather Wood");
@@ -28,6 +30,8 @@ public class Wood : Interactable
 
     public override void OnLoseFocus()
     {
+        base.OnLoseFocus();
+
         UIManager.Instance.HideMessage();
     }
 }
