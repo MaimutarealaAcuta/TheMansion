@@ -87,6 +87,8 @@ public class FirstPersonController : MonoBehaviour, IDamageable
     [SerializeField] private AudioClip[] woodClips = default;
     [SerializeField] private AudioClip[] grassClips = default;
     [SerializeField] private AudioClip[] gravelClips = default;
+    [SerializeField] private AudioClip[] mudClips = default;
+    [SerializeField] private AudioClip[] stoneClips = default;
     private float footstepTimer = 0;
     private float GetCurrentOffset => isCrouching ? baseStepSpeed * crouchStepMultipler : IsSprinting ? baseStepSpeed * sprintStepMultipler : baseStepSpeed;
 
@@ -233,6 +235,12 @@ public class FirstPersonController : MonoBehaviour, IDamageable
                         break;
                     case "Footsteps/Gravel":
                         footstepAudioSource.PlayOneShot(gravelClips[UnityEngine.Random.Range(0, gravelClips.Length - 1)]);
+                        break;
+                    case "Footsteps/Mud":
+                        footstepAudioSource.PlayOneShot(mudClips[UnityEngine.Random.Range(0, mudClips.Length - 1)]);
+                        break;
+                    case "Footsteps/Stone":
+                        footstepAudioSource.PlayOneShot(stoneClips[UnityEngine.Random.Range(0, stoneClips.Length - 1)]);
                         break;
                     default:
                         break;

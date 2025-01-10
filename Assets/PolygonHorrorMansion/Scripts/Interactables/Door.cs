@@ -10,6 +10,7 @@ public class Door : Interactable
     [SerializeField] private float openAngle = 90f;
     [SerializeField] private float openSpeed = 2f;
     [SerializeField] private float colliderEnableThreshold = 5f;
+    [SerializeField] private bool shouldDoorBeOutlined = false;
 
     [Header("Lock Settings")]
     [SerializeField] public bool requireKey = false;
@@ -64,7 +65,13 @@ public class Door : Interactable
             {
                 SoundManager.Instance.PlaySFX(closedDoorSound);
 
-                UIManager.Instance.ShowMessage($"You need the '{requiredKeyName}' key to open this door");
+                if (requiredKeyName == "Locked")
+                {
+                    UIManager.Instance.ShowMessage($"Locked.");
+                } else
+                {
+                    UIManager.Instance.ShowMessage($"{requiredKeyName} key required to open this door.");
+                }
 
                 return;
             }
@@ -166,11 +173,11 @@ public class Door : Interactable
 
     public override void OnFocus()
     {
-
+        if (shouldDoorBeOutlined) base.OnFocus();
     }
 
     public override void OnLoseFocus()
     {
-
+        if (shouldDoorBeOutlined) base.OnLoseFocus();
     }
 }

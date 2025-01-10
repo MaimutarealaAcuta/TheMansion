@@ -120,6 +120,7 @@ public class SoundManager : MonoBehaviour
 
         if (clipsDictionary.TryGetValue(sfxKey, out AudioClip clip))
         {
+            sfxSource.pitch = Random.Range(0.9f, 1.1f);
             sfxSource.PlayOneShot(clip, sfxVolume);
         }
         else

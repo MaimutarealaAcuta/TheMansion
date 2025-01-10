@@ -27,7 +27,7 @@ public class DebugControls : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.K))
         {
-            PlayerInventory.AddKey("Main Door Key");
+            PlayerInventory.AddKey("Outside Basement Door");
         }
 
     }
