@@ -11,6 +11,24 @@ public class Furnace : Interactable
     [Header("Wood Requirements")]
     [SerializeField] private int requiredWood = 6;
 
+    [Header("Audio References")]
+    [SerializeField] AudioSource furnaceSource;
+    [SerializeField] AudioClip burningSound;
+    [SerializeField] private string fireSound = "fire";
+    [SerializeField] private string loadWoodSound = "load_wood";
+    [SerializeField] private string cannotSound = "cannot_collect_wood";
+
+    private void Start()
+    {
+        if (furnaceSource != null)
+        {
+            furnaceSource.clip = burningSound;
+            furnaceSource.loop = true;
+            furnaceSource.playOnAwake = false;
+            furnaceSource.spatialBlend = 1f;
+        }
+    }
+
     public override void OnFocus()
     {
         if (UIManager.Instance.IsDisplayingMessage) return;
@@ -47,6 +65,7 @@ public class Furnace : Interactable
         // If the furnace door is closed, don't allow loading wood or burning monsters
         if (!doorIsOpen)
         {
+            SoundManager.Instance.PlaySFX(cannotSound);
             UIManager.Instance.ShowMessage("The furnace door is closed!");
             return;
         }
@@ -61,6 +80,7 @@ public class Furnace : Interactable
             }
             else
             {
+                SoundManager.Instance.PlaySFX(cannotSound);
                 UIManager.Instance.ShowMessage("Not enough wood to load!");
             }
         }
@@ -77,11 +97,13 @@ public class Furnace : Interactable
                 }
                 else
                 {
+                    SoundManager.Instance.PlaySFX(cannotSound);
                     UIManager.Instance.ShowMessage("You need a monster to burn!");
                 }
             }
             else
             {
+                SoundManager.Instance.PlaySFX(cannotSound);
                 UIManager.Instance.ShowMessage("You need a monster to burn!");
             }
         }
@@ -90,16 +112,26 @@ public class Furnace : Interactable
     private void LoadFireplace()
     {
         isLoaded = true;
+
+        SoundManager.Instance.PlaySFX(loadWoodSound);
         UpdateVisuals();
 
-        // TO DO: Lay a sound or particle effect for ignition
+        Invoke(nameof(FireTheLogs), .3f); // Waits for .5 seconds
+    }
+
+    private void FireTheLogs()
+    {
+        SoundManager.Instance.PlaySFX(fireSound);
+        PlayBurningAudio();
     }
 
     private void BurnMonster(Monster monster)
     {
         monster.Burn();
         isLoaded = false;
-        UpdateVisuals();
+
+        Invoke(nameof(UpdateVisuals), 1f);
+        StopBurningAudio();
     }
 
     private void UpdateVisuals()
@@ -108,6 +140,22 @@ public class Furnace : Interactable
         {
             woodStack.SetActive(isLoaded);
             fireLight.SetActive(isLoaded);
+        }
+    }
+
+    void PlayBurningAudio()
+    {
+        if (furnaceSource != null)
+        {
+            furnaceSource.Play();
+        }
+    }
+
+    void StopBurningAudio()
+    {
+        if (furnaceSource != null)
+        {
+            furnaceSource.Stop();
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,6 +11,10 @@ public class ChaseState : EnemyState
     public EnemyManager enemyManager;
     private bool playerCollided = false;
 
+    public AudioSource chaseAudioSource;
+    public AudioClip chaseMusicClip;
+    private bool isAudioPlaying = false;
+
     private float currentSpeed; // Tracks current speed
     public float maxSpeed = 4.1f; // Maximum speed
     public float accelerationRate = 1f; // Rate of speed increase per second
@@ -18,6 +23,14 @@ public class ChaseState : EnemyState
     private void Start()
     {
         currentSpeed = startingSpeed;
+
+        if (chaseAudioSource != null)
+        {
+            chaseAudioSource.clip = chaseMusicClip;
+            chaseAudioSource.loop = true;
+            chaseAudioSource.playOnAwake = false;
+            chaseAudioSource.spatialBlend = 1f;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -39,10 +52,16 @@ public class ChaseState : EnemyState
 
     public override EnemyState RunCurrentState(EnemyManager enemy)
     {
+        if (!isAudioPlaying)
+        {
+            PlayChasingAudio();
+        }
+
         // If we collided with the player, switch to attack state
         if (playerCollided)
         {
             playerCollided = false;
+            StopChasingAudio();
             return attackState;
         }
 
@@ -64,6 +83,7 @@ public class ChaseState : EnemyState
                 float distance = Vector3.Distance(enemy.transform.position, destination);
                 if (distance < enemy.navMeshAgent.stoppingDistance + 0.5f)
                 {
+                    StopChasingAudio();
                     return patrolState;
                 }
             }
@@ -76,6 +96,7 @@ public class ChaseState : EnemyState
             // If no tracking info from the monster and we can’t see the player, go back to patrol
             if (!enemy.fov.canSeePlayer)
             {
+                StopChasingAudio();
                 return patrolState;
             }
 
@@ -92,6 +113,26 @@ public class ChaseState : EnemyState
 
             // Remain in chase
             return this;
+        }
+    }
+
+    void PlayChasingAudio()
+    {
+        isAudioPlaying = true;
+
+        if (chaseAudioSource != null && !chaseAudioSource.isPlaying)
+        {
+            chaseAudioSource.Play();
+        }
+    }
+
+    void StopChasingAudio()
+    {
+        isAudioPlaying = false;
+
+        if (chaseAudioSource != null && !chaseAudioSource.isPlaying)
+        {
+            chaseAudioSource.Stop();
         }
     }
 }

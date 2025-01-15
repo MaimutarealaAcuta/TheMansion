@@ -14,13 +14,9 @@ public class Monster : Interactable, IItem
     private Collider col;
     private Rigidbody rb;
 
-    [Header("Monster Settings")]
-    [SerializeField] private string monsterName = "Small Monster";
-
     // Audio references for crying/screaming
-    [SerializeField] private AudioClip crySound;
-    [SerializeField] private AudioClip screamSound;
-    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private string crySound = "monster_moan";
+    [SerializeField] private string screamSound = "monster_scream";
 
     private MonsterPatrol patrol;
     private bool updatePositionRunning = false;
@@ -64,10 +60,6 @@ public class Monster : Interactable, IItem
 
             // Monster cries upon being picked up
             OnMonsterCry?.Invoke();
-
-            // Play cry sound if available
-            if (audioSource && crySound)
-                audioSource.PlayOneShot(crySound);
 
             // Stop movement via patrol system
             if (patrol) patrol.PauseMovement();
@@ -142,9 +134,7 @@ public class Monster : Interactable, IItem
             // Trigger scream event
             OnMonsterScream?.Invoke();
 
-            // Play scream sound if available
-            if (audioSource && screamSound)
-                audioSource.PlayOneShot(screamSound);
+            SoundManager.Instance.PlaySFX(screamSound);
 
             // Stop updating position once dropped
             StopUpdatingPosition();
@@ -181,9 +171,10 @@ public class Monster : Interactable, IItem
     {
         while (updatePositionRunning && player != null)
         {
-            // Invoke event with player�s current position
+            SoundManager.Instance.PlaySFX($"{crySound}{UnityEngine.Random.Range(1, 6)}");
+            // Invoke event with players current position
             OnMonsterCarriedUpdate?.Invoke(player.transform.position);
-            yield return new WaitForSeconds(0.5f); // Update every half second
+            yield return new WaitForSeconds(1f);
         }
     }
 }
