@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene1.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
+    path: Assets/Scenes/MainMenu/MainMenu.unity
+    guid: f8da68c183c0cbb4ebe486399668c83b
+  - enabled: 1
     path: Assets/PolygonHorrorMansion/Scenes/Main Scene.unity
     guid: dda52f1b21df39c459a6b2eafa31df9d
   - enabled: 1
