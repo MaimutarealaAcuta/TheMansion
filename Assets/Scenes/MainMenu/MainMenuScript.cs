@@ -17,6 +17,7 @@ public class MainMenuScript : MonoBehaviour
     public void Start()
     {
         ExitOptions();
+        FindObjectOfType<SoundManager>().PlayBGM("bg_music");
     }
 
     public void PlayGame()
