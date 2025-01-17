@@ -19,6 +19,7 @@ public class FieldOfView : MonoBehaviour
     public bool canSeePlayer = false;
     FirstPersonController playerControler;
 
+    [SerializeField]
     private float playerHeightOffset = 1.5f; // Adjust if needed
 
     private void Start()
