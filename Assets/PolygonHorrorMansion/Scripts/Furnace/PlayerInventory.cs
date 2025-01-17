@@ -13,6 +13,7 @@ public static class PlayerInventory
 
     public static bool hasWoodenSpike = false;
     public static int monstersBurned = 0;
+    public static bool monsterGoalCompleted = false;
 
     private static List<string> keys = new List<string>();
 
@@ -66,5 +67,24 @@ public static class PlayerInventory
             return true;
         }
         return false;
+    }
+
+    public static void MonsterBurned()
+    {
+        if (monsterGoalCompleted) return;
+
+        monstersBurned++;
+
+        if (monstersBurned == 8)
+        {
+            GoalManager.Instance.CompleteGoal("BurnTheMinions");
+            monsterGoalCompleted = true;
+            return;
+        }
+
+        string description = $"Those minions seem off.\r\nBurn them [{monstersBurned}/8]";
+        SoundManager.Instance.PlaySFX("task_completed");
+
+        GoalManager.Instance.UpdateGoalDescription(description);
     }
 }

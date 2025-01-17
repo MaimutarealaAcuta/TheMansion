@@ -452,4 +452,15 @@ public class FirstPersonController : MonoBehaviour, IDamageable
 
         regeneratingStamina = null;
     }
+
+    public void Heal(float healAmount)
+    {
+        currentHealth += healAmount;
+
+        if (currentHealth > maxHealth)
+        {
+            currentHealth = maxHealth;
+            OnHeal?.Invoke(currentHealth);
+        }
+    }
 }

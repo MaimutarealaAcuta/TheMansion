@@ -7,7 +7,7 @@ public class DebugControls : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.M))
         {
             // Increase monster count
-            PlayerInventory.monstersBurned++;
+            PlayerInventory.MonsterBurned();
             Debug.Log("Increased monstersBurned to: " + PlayerInventory.monstersBurned);
         }
 
@@ -29,6 +29,7 @@ public class DebugControls : MonoBehaviour
         {
             PlayerInventory.AddKey("Outside Basement Door");
             PlayerInventory.AddKey("Main Door");
+            PlayerInventory.AddKey("Chest");
         }
 
     }

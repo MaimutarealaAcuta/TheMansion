@@ -5,13 +5,16 @@ public class Count : Interactable
     // Conditions: Player needs hasWoodenSpike = true and monstersBurned >= 8 to kill the Count.
     // Otherwise, the Count kills the player by dealing damage.
 
+    [SerializeField] private Door mainGates;
+    [SerializeField] private string deathSound = "count_death";
+
     public override void OnFocus()
     {
         // Check inventory state and show appropriate message.
         if (!PlayerInventory.hasWoodenSpike)
         {
             // No spike
-            UIManager.Instance.ShowMessage("You need something sharp to stab the Count");
+            UIManager.Instance.ShowMessage("Disturb.");
         }
         else
         {
@@ -24,7 +27,7 @@ public class Count : Interactable
             //else
             //{
                 // Conditions met: Player can kill the Count
-                UIManager.Instance.ShowMessage("Press Interact to stab the Count");
+                UIManager.Instance.ShowMessage("Stab.");
             //}
         }
     }
@@ -54,7 +57,11 @@ public class Count : Interactable
             {
                 // Conditions are met: Kill the Count
                 UIManager.Instance.ShowMessage("You have slain the Count!");
-                Destroy(gameObject);
+                gameObject.SetActive(false);
+
+                SoundManager.Instance.PlaySFX(deathSound);
+
+                Invoke("OpenTheGates", 2.5f); // delay
             }
         }
     }
@@ -67,5 +74,13 @@ public class Count : Interactable
             UIManager.Instance.HideMessage();
             player.ApplyDamage(10); // This will kill the player
         }
+    }
+
+    private void OpenTheGates()
+    {
+        GoalManager.Instance.CompleteGoal("KillTheCount");
+
+        mainGates.requireKey = false;
+        mainGates.OnInteract();
     }
 }

@@ -6,7 +6,7 @@ public class Coffin : Interactable
     [Header("Coffin Settings")]
     [SerializeField] private Transform lidTransform;
     [SerializeField] private Rigidbody lidRigidbody;
-    [SerializeField] private float lidNudgeAmount = 0.5f; // How much to move lid on X axis
+    [SerializeField] private float lidNudgeAmount = .5f; // How much to move lid on X axis
     [SerializeField] private float moveDuration = 0.5f;   // Duration of the smooth move
 
     private bool hasBeenInteracted = false;

@@ -13,9 +13,9 @@ public class UIManager : MonoBehaviour
 
     [Header("Message Display Settings")]
     [SerializeField] private TextMeshProUGUI infoMessage;
-    [SerializeField] private float fadeInDuration = 0.5f;   // Time to fade in
-    [SerializeField] private float displayDuration = 2f;    // Time text stays visible
-    [SerializeField] private float fadeOutDuration = 0.5f;  // Time to fade out
+    [SerializeField] private float fadeInDuration = 0.4f;   // Time to fade in
+    [SerializeField] private float displayDuration = 1.7f;    // Time text stays visible
+    [SerializeField] private float fadeOutDuration = 0.4f;  // Time to fade out
 
     [Header("Game Over Settings")]
     public GameObject gameOverPanel;

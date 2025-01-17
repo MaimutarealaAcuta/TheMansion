@@ -110,4 +110,9 @@ public class GoalManager : MonoBehaviour
         //if (goalTitleText) goalTitleText.text = "";
         if (goalDescriptionText) goalDescriptionText.text = "";
     }
+
+    public void UpdateGoalDescription(string description)
+    {
+        goalDescriptionText.text = description;
+    }
 }

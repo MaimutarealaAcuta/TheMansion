@@ -2,11 +2,17 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
+enum Axis
+{
+    X, Y, Z
+}
+
 public class Door : Interactable
 {
     [Header("Door Configuration")]
     [SerializeField] private bool isDoubleDoor = false;
     [SerializeField] private Transform otherDoor;
+    [SerializeField] private Axis openAxis = Axis.Y;
     [SerializeField] private float openAngle = 90f;
     [SerializeField] private float openSpeed = 2f;
     [SerializeField] private float colliderEnableThreshold = 5f;
@@ -39,14 +45,14 @@ public class Door : Interactable
     private void Start()
     {
         closedRotation = transform.rotation;
-        openRotation = closedRotation * Quaternion.Euler(0, openAngle, 0);
+        openRotation = closedRotation * getAxisOpenAngle(false);
 
         if (isDoubleDoor && otherDoor != null)
         {
             otherDoorRef = otherDoor.GetComponent<Door>();
             otherDoorClosedRotation = otherDoor.rotation;
             // Other door opens in opposite direction
-            otherDoorOpenRotation = otherDoorClosedRotation * Quaternion.Euler(0, -openAngle, 0);
+            otherDoorOpenRotation = otherDoorClosedRotation * getAxisOpenAngle(true);
         }
 
 
@@ -179,5 +185,28 @@ public class Door : Interactable
     public override void OnLoseFocus()
     {
         if (shouldDoorBeOutlined) base.OnLoseFocus();
+    }
+
+    private Quaternion getAxisOpenAngle(bool otherDoor)
+    {
+        Quaternion axisOpenAngle = Quaternion.identity;
+        float angle = otherDoor ? -openAngle : openAngle;
+
+        switch (openAxis)
+        {
+            case Axis.X:
+                axisOpenAngle = Quaternion.Euler(angle, 0, 0);
+                break;
+            case Axis.Y:
+                axisOpenAngle = Quaternion.Euler(0, angle, 0);
+                break;
+            case Axis.Z:
+                axisOpenAngle = Quaternion.Euler(0, 0, angle);
+                break;
+            default:
+                break;
+        }
+
+        return axisOpenAngle;
     }
 }

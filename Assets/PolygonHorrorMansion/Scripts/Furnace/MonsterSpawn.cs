@@ -6,6 +6,7 @@ public class MonsterSpawn : MonoBehaviour
     [SerializeField] private List<GameObject> monstersList = new List<GameObject>();
     [SerializeField] private string playerTag = "Player";
     [SerializeField] private string spawnSound = "minions_spawn";
+    [SerializeField] private string goalID = "minions_spawn";
 
     private bool triggered = false;
 
@@ -30,6 +31,8 @@ public class MonsterSpawn : MonoBehaviour
                     }
                 }
             }
+
+            GoalManager.Instance.CompleteGoal(goalID);
 
             // Destroy this trigger so it only happens once
             Destroy(gameObject);

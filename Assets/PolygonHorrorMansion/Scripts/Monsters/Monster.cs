@@ -140,7 +140,7 @@ public class Monster : Interactable, IItem
             StopUpdatingPosition();
 
             // Increment burned monsters counter
-            PlayerInventory.monstersBurned++;
+            PlayerInventory.MonsterBurned();
 
             // Destroy the monster after screaming (or after a delay)
             Destroy(gameObject, .2f);

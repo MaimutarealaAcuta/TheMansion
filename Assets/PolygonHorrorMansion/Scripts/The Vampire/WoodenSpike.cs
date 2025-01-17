@@ -4,18 +4,20 @@ public class WoodenSpike : Interactable
 {
     public override void OnFocus()
     {
-        UIManager.Instance.ShowMessage("Press Interact to pick up wooden spike");
+        base.OnFocus();
+        UIManager.Instance.ShowMessage("Take wooden spike.");
     }
 
     public override void OnLoseFocus()
     {
+        base.OnLoseFocus();
         UIManager.Instance.HideMessage();
     }
 
     public override void OnInteract()
     {
         PlayerInventory.hasWoodenSpike = true;
-        UIManager.Instance.ShowMessage("You picked up a wooden spike!");
+        UIManager.Instance.ShowMessage("You Know What to Do!");
         Destroy(gameObject);
     }
 }
