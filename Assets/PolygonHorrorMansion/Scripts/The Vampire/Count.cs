@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Count : Interactable
@@ -7,6 +8,9 @@ public class Count : Interactable
 
     [SerializeField] private Door mainGates;
     [SerializeField] private string deathSound = "count_death";
+    [SerializeField] private string batsSound = "bats";
+    [SerializeField] private GameObject flock;
+    [SerializeField] private FlockManager flockManager;
 
     public override void OnFocus()
     {
@@ -68,10 +72,23 @@ public class Count : Interactable
 
     private void KillPlayer()
     {
+        UIManager.Instance.HideMessage();
+
+        gameObject.SetActive(false);
+        flock.SetActive(true);
+
+        SoundManager.Instance.PlaySFX(batsSound);
+        flockManager.ActivateGoAround();
+
+        Invoke("GameOver", 5f);
+    }
+
+    private void GameOver()
+    {
         FirstPersonController player = FindObjectOfType<FirstPersonController>();
+
         if (player != null)
         {
-            UIManager.Instance.HideMessage();
             player.ApplyDamage(10); // This will kill the player
         }
     }
