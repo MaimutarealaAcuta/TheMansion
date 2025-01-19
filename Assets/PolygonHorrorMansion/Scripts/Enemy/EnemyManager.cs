@@ -39,12 +39,16 @@ public class EnemyManager : MonoBehaviour
     {
         Monster.OnMonsterCry += OnMonsterPickedUp;
         Monster.OnMonsterCarriedUpdate += OnMonsterPositionUpdate;
+        Monster.OnMonsterDropped += OnMonsterLost;
+        Monster.OnMonsterBurned += OnMonsterLost;
     }
 
     private void OnDisable()
     {
         Monster.OnMonsterCry -= OnMonsterPickedUp;
         Monster.OnMonsterCarriedUpdate -= OnMonsterPositionUpdate;
+        Monster.OnMonsterDropped -= OnMonsterLost;
+        Monster.OnMonsterBurned -= OnMonsterLost;
     }
 
     private void OnMonsterPickedUp()
@@ -126,5 +130,11 @@ public class EnemyManager : MonoBehaviour
             default:
                 return "Idle";
         }
+    }
+
+    private void OnMonsterLost()
+    {
+        isTrackingPlayer = false;
+        lastKnownPlayerPosition = null;
     }
 }

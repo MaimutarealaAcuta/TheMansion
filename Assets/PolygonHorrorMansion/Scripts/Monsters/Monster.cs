@@ -5,6 +5,8 @@ public class Monster : Interactable, IItem
 {
     public static event Action OnMonsterCry;
     public static event Action OnMonsterScream;
+    public static event Action OnMonsterDropped;
+    public static event Action OnMonsterBurned;
     public static event Action<Vector3> OnMonsterCarriedUpdate;
 
     public FirstPersonController player;
@@ -117,6 +119,9 @@ public class Monster : Interactable, IItem
 
             // Run to next waypoint once dropped
             if (patrol) patrol.RunToNextWaypoint();
+
+            // The monster is no longer carried
+            OnMonsterDropped?.Invoke();
         }
     }
 
@@ -141,6 +146,9 @@ public class Monster : Interactable, IItem
 
             // Increment burned monsters counter
             PlayerInventory.MonsterBurned();
+
+            // The monster is no longer carried
+            OnMonsterBurned?.Invoke();
 
             // Destroy the monster after screaming (or after a delay)
             Destroy(gameObject, .2f);

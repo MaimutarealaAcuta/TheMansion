@@ -119,43 +119,49 @@ public class Door : Interactable
         mainCollider.enabled = false;
         if (otherCollider != null) otherCollider.enabled = false;
 
+        Quaternion startRotation = transform.rotation;
         Quaternion targetRotation = isOpen ? openRotation : closedRotation;
-        Quaternion otherTargetRotation = isOpen ? otherDoorOpenRotation : otherDoorClosedRotation;
 
-        float remainingAngle;
+        Quaternion otherStartRotation = Quaternion.identity;
+        Quaternion otherTargetRotation = Quaternion.identity;
+
+        if (isDoubleDoor && otherDoor != null)
+        {
+            otherStartRotation = otherDoor.rotation;
+            otherTargetRotation = isOpen ? otherDoorOpenRotation : otherDoorClosedRotation;
+        }
+
+        float duration = 2f / openSpeed; // Total animation duration
+        float elapsed = 0f;
 
         bool navMeshChanged = false;
 
-        do
+        while (elapsed < duration)
         {
-            // Calculate remaining angle (use the maximum of both doors if it's a double door)
-            float mainAngle = Quaternion.Angle(transform.rotation, targetRotation);
-            float otherAngle = isDoubleDoor && otherDoor != null ?
-                              Quaternion.Angle(otherDoor.rotation, otherTargetRotation) : 0f;
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
 
-            remainingAngle = Mathf.Max(mainAngle, otherAngle);
+            // Smooth progression using an easing function
+            float smoothStep = Mathf.SmoothStep(0f, 1f, t);
 
-            // Rotate main door
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation,
-                                                Time.deltaTime * openSpeed);
+            // Interpolate main door rotation
+            transform.rotation = Quaternion.Slerp(startRotation, targetRotation, smoothStep);
 
-            // Rotate other door if it's a double door
+            // Interpolate other door rotation if it's a double door
             if (isDoubleDoor && otherDoor != null)
             {
-                otherDoor.rotation = Quaternion.Slerp(otherDoor.rotation, otherTargetRotation,
-                                                     Time.deltaTime * openSpeed);
+                otherDoor.rotation = Quaternion.Slerp(otherStartRotation, otherTargetRotation, smoothStep);
             }
 
-            // Enable colliders when near target
-            if (remainingAngle <= colliderEnableThreshold)
+            // Enable colliders near the end of the animation
+            if (t >= 1f - (colliderEnableThreshold / 90f))
             {
                 if (!mainCollider.enabled) mainCollider.enabled = true;
                 if (otherCollider != null && !otherCollider.enabled) otherCollider.enabled = true;
             }
 
-
-            //Let enemy through
-            if (!navMeshChanged && remainingAngle < 40f && navMeshObst != null)
+            // Toggle NavMeshObstacle if needed
+            if (!navMeshChanged && t >= 0.6f && navMeshObst != null)
             {
                 navMeshObst.enabled = !navMeshObst.enabled;
                 navMeshChanged = true;
@@ -163,9 +169,8 @@ public class Door : Interactable
 
             yield return null;
         }
-        while (remainingAngle > 0.2f);
 
-        // Final snap to target rotations
+        // Snap to final target rotations
         transform.rotation = targetRotation;
         if (isDoubleDoor && otherDoor != null)
         {
