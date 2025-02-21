@@ -1,6 +1,11 @@
 using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -11,11 +16,27 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI staminaText = default;
     [SerializeField] private TextMeshProUGUI woodText = default;
 
+
+    [SerializeField] private Image healthBar = default;
+    [SerializeField] private Image staminaBar = default;
+    [SerializeField] private RectMask2D staminaMask = default;
+    private float maxRightMask;
+    private float initialRightMask;
+
+    [SerializeField] Volume postProcessingVolume = default;
+
     [Header("Message Display Settings")]
     [SerializeField] private TextMeshProUGUI infoMessage;
     [SerializeField] private float fadeInDuration = 0.4f;   // Time to fade in
     [SerializeField] private float displayDuration = 1.7f;    // Time text stays visible
     [SerializeField] private float fadeOutDuration = 0.4f;  // Time to fade out
+
+    [Header("Pause Game Settings")]
+    [SerializeField] private GameObject pausePanel;
+
+    [Header("Stats sprites")]
+    [SerializeField] private Sprite[] healthSprites;
+
 
     [Header("Game Over Settings")]
     public GameObject gameOverPanel;
@@ -64,16 +85,44 @@ public class UIManager : MonoBehaviour
         UpdateHealth(3);
         UpdateStamina(100);
         UpdateWoodCount(0);
+
+        //pausePanel.SetActive(false);
+
+        // Get the initial and max right mask values
+        maxRightMask = staminaMask.rectTransform.rect.width - staminaMask.padding.x - staminaMask.padding.z;
+        initialRightMask = staminaMask.rectTransform.offsetMax.x;
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePausePanel();
+        }
     }
 
     private void UpdateHealth(float currentHealth)
     {
-        healthText.text = "Health: " + currentHealth.ToString();
+        //healthText.text = "Health: " + currentHealth.ToString();
+        healthBar.sprite = healthSprites[(int)currentHealth];
+
+        // change color adjustment saturation based on health
+        ColorAdjustments colorAdjustments;
+        if(postProcessingVolume.profile.TryGet<ColorAdjustments>(out colorAdjustments))
+            colorAdjustments.saturation.Override(1 - currentHealth / 3);
     }
 
     private void UpdateStamina(float currentStamina)
     {
-        staminaText.text = "Stamina: " + currentStamina.ToString("00");
+        //staminaText.text = "Stamina: " + currentStamina.ToString("00");
+        float newRightMask = maxRightMask * (1 - currentStamina / 100);
+        staminaMask.padding = new Vector4(0, 0, newRightMask, 0);
+
+        // add chromatic aberation effect when stamina is low
+        ChromaticAberration chromaticAberration;
+        if(postProcessingVolume.profile.TryGet<ChromaticAberration>(out chromaticAberration))
+            chromaticAberration.intensity.Override(1 - currentStamina / 100);
+
     }
 
     private void UpdateWoodCount(int woodCount)
@@ -174,5 +223,27 @@ public class UIManager : MonoBehaviour
         {
             gameOverPanel.SetActive(false);
         }
+    }
+
+    // pause logic
+    public void TogglePausePanel()
+    {
+        if (pausePanel != null)
+        {
+            pausePanel.SetActive(!pausePanel.activeSelf);
+            // Pause the game when the pause panel is active
+            Time.timeScale = pausePanel.activeSelf ? 0f : 1f;
+            // enable mouse cursor
+            Cursor.visible = pausePanel.activeSelf;
+            Cursor.lockState = pausePanel.activeSelf ? CursorLockMode.None : CursorLockMode.Locked;
+        }
+    }
+
+    // return to main menu
+    public void Quit()
+    {
+        // Unpause the game before quitting
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);   
     }
 }

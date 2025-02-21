@@ -9,6 +9,7 @@ TagManager:
   - Footsteps/Gravel
   - Footsteps/Mud
   - Footsteps/Stone
+  - Enemy
   layers:
   - Default
   - TransparentFX
